@@ -1,5 +1,7 @@
 import './style.css'
 import { setupCharacterList } from './pages/characters.js'
+import { setupEpisodesList } from './pages/episodes.js'
+import { setupLocationList } from './pages/location.js'
 
 document.querySelector('#app').innerHTML = `
   <main class="page-shell">
@@ -47,10 +49,94 @@ document.querySelector('#app').innerHTML = `
 
       <div id="characters-list" class="characters-list" aria-live="polite"></div>
     </section>
+
+    <section class="characters-section" id="episodes">
+      <div class="characters-header">
+        <div>
+          <p class="eyebrow">Episodes</p>
+          <h2>Alle episodes</h2>
+        </div>
+
+        <div class="episode-controls">
+          <label class="sr-only" for="episode-filter">Filter episodes</label>
+          <input
+            id="episode-filter"
+            class="search-input"
+            type="search"
+            placeholder="Zoek op titel, code of datum"
+          />
+
+          <label class="sr-only" for="season-filter">Filter op seizoen</label>
+          <select id="season-filter" class="search-input">
+            <option value="all">Alle seizoenen</option>
+          </select>
+
+          <label class="sr-only" for="episode-sort">Sorteer episodes</label>
+          <select id="episode-sort" class="search-input">
+            <option value="number-asc">Oud naar nieuw</option>
+            <option value="number-desc">Nieuw naar oud</option>
+            <option value="name-asc">Naam A-Z</option>
+            <option value="name-desc">Naam Z-A</option>
+            <option value="date-asc">Datum oplopend</option>
+            <option value="date-desc">Datum aflopend</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="episodes-list" class="characters-list" aria-live="polite"></div>
+    </section>
+
+    <section class="characters-section" id="location">
+      <div class="characters-header">
+        <div>
+          <p class="eyebrow">Locatie</p>
+          <h2>Alle locaties</h2>
+        </div>
+
+        <div class="episode-controls">
+          <label class="sr-only" for="location-filter">Filter locaties</label>
+          <input
+            id="location-filter"
+            class="search-input"
+            type="search"
+            placeholder="Zoek op naam, type of dimensie"
+          />
+
+          <label class="sr-only" for="location-type-filter">Filter op type</label>
+          <select id="location-type-filter" class="search-input">
+            <option value="all">Alle types</option>
+          </select>
+
+          <label class="sr-only" for="location-sort">Sorteer locaties</label>
+          <select id="location-sort" class="search-input">
+            <option value="name-asc">Naam A-Z</option>
+            <option value="name-desc">Naam Z-A</option>
+            <option value="residents-desc">Meeste bewoners</option>
+            <option value="residents-asc">Minste bewoners</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="location-list" class="characters-list" aria-live="polite"></div>
+    </section>
   </main>
 `
 
 setupCharacterList({
   listElement: document.querySelector('#characters-list'),
   filterElement: document.querySelector('#character-filter'),
+})
+
+setupEpisodesList({
+  listElement: document.querySelector('#episodes-list'),
+  filterElement: document.querySelector('#episode-filter'),
+  seasonElement: document.querySelector('#season-filter'),
+  sortElement: document.querySelector('#episode-sort'),
+})
+
+setupLocationList({
+  listElement: document.querySelector('#location-list'),
+  filterElement: document.querySelector('#location-filter'),
+  typeElement: document.querySelector('#location-type-filter'),
+  sortElement: document.querySelector('#location-sort'),
 })
