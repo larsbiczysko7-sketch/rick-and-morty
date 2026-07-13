@@ -1,3 +1,5 @@
+import { createFavoriteButton } from './favorites.js'
+
 const LOCATION_API_URL = 'https://rickandmortyapi.com/api/location'
 
 const fetchAllLocations = async () => {
@@ -75,6 +77,11 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
                     <p><strong>Dimensie:</strong> ${location.dimension || 'Onbekend'}</p>
                     <p><strong>Bewoners:</strong> ${location.residents.length}</p>
                     <p><strong>Gebouwd:</strong> ${location.created}</p>
+                    ${createFavoriteButton({
+                      entityType: 'location',
+                      entityId: location.id,
+                      entityName: location.name,
+                    })}
                   </div>
                 </article>
               `,

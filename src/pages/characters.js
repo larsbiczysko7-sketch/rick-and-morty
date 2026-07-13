@@ -1,3 +1,5 @@
+import { createFavoriteButton } from './favorites.js'
+
 const CHARACTER_API_URL = 'https://rickandmortyapi.com/api/character?page=1'
 
 export async function setupCharacterList({ listElement, filterElement }) {
@@ -32,6 +34,11 @@ export async function setupCharacterList({ listElement, filterElement }) {
                     <p><strong>Soort:</strong> ${character.species}</p>
                     <p><strong>Geslacht:</strong> ${character.gender}</p>
                     <p><strong>Oorsprong:</strong> ${character.origin.name}</p>
+                    ${createFavoriteButton({
+                      entityType: 'character',
+                      entityId: character.id,
+                      entityName: character.name,
+                    })}
                   </div>
                 </article>
               `,
