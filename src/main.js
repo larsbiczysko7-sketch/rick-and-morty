@@ -1,4 +1,5 @@
 import './style.css'
+import { setupCharacterList } from './pages/characters.js'
 
 document.querySelector('#app').innerHTML = `
   <main class="page-shell">
@@ -7,8 +8,6 @@ document.querySelector('#app').innerHTML = `
         <p class="eyebrow">Rick and Morty</p>
         <h1>Ontdek personages, locaties en episodes</h1>
       </div>
-
-      <a class="favorites-link" href="#favorites">Favorieten</a>
     </header>
 
     <section class="search-area" aria-label="Zoeken in de app">
@@ -30,5 +29,28 @@ document.querySelector('#app').innerHTML = `
       </ul>
     </section>
 
+    <section class="characters-section" id="characters">
+      <div class="characters-header">
+        <div>
+          <p class="eyebrow">Personages</p>
+          <h2>Alle karakters</h2>
+        </div>
+
+        <label class="sr-only" for="character-filter">Filter karakters</label>
+        <input
+          id="character-filter"
+          class="search-input"
+          type="search"
+          placeholder="Filter op naam, soort of status"
+        />
+      </div>
+
+      <div id="characters-list" class="characters-list" aria-live="polite"></div>
+    </section>
   </main>
 `
+
+setupCharacterList({
+  listElement: document.querySelector('#characters-list'),
+  filterElement: document.querySelector('#character-filter'),
+})
