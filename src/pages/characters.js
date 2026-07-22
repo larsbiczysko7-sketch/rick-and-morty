@@ -140,6 +140,10 @@ export async function setupCharacterList({ listElement, filterElement }) {
         entityData: getFavoriteDataFromButton(favoriteButton),
       })
     })
+
+		document.addEventListener('favorites-changed', () => {
+			renderCharacters(filterElement.value)
+		})
   } catch (error) {
     listElement.innerHTML = '<p>De karakters konden niet worden geladen.</p>'
     console.error(error)

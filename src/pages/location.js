@@ -167,6 +167,10 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
         entityData: getFavoriteDataFromButton(favoriteButton),
       })
     })
+
+		document.addEventListener('favorites-changed', () => {
+			renderLocations()
+		})
   } catch (error) {
     listElement.innerHTML = '<p>De locaties konden niet worden geladen.</p>'
     console.error(error)

@@ -51,6 +51,11 @@ const decodeDataAttribute = (value) => {
 }
 
 export function createFavoriteButton({ entityType, entityId, entityName, entityData }) {
+	const favorites = readFavorites()
+	const isFavorite = favorites.some(
+		(favorite) => favorite.entityType === entityType && String(favorite.entityId) === String(entityId),
+	)
+
 	return `
 		<button
 			type="button"
@@ -60,7 +65,7 @@ export function createFavoriteButton({ entityType, entityId, entityName, entityD
 			data-favorite-name="${entityName}"
 			data-favorite-data="${encodeDataAttribute(entityData)}"
 		>
-			Favoriet
+			${isFavorite ? 'Verwijder van favorieten' : 'Favoriet'}
 		</button>
 	`
 }
@@ -84,6 +89,10 @@ const writeFavorites = (favorites) => {
 	localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites))
 }
 
+const notifyFavoritesChanged = () => {
+	document.dispatchEvent(new CustomEvent('favorites-changed'))
+}
+
 export const getFavorites = () => readFavorites()
 
 export const toggleFavorite = ({ entityType, entityId, entityName, entityData = null }) => {
@@ -99,12 +108,34 @@ export const toggleFavorite = ({ entityType, entityId, entityName, entityData = 
 		: [...favorites, { entityType, entityId, entityName, entityData }]
 
 	writeFavorites(nextFavorites)
+	notifyFavoritesChanged()
+	return nextFavorites
+}
+
+export const removeFavorite = ({ entityType, entityId }) => {
+	const favorites = readFavorites()
+	const nextFavorites = favorites.filter(
+		(favorite) => !(favorite.entityType === entityType && String(favorite.entityId) === String(entityId)),
+	)
+
+	writeFavorites(nextFavorites)
+	notifyFavoritesChanged()
 	return nextFavorites
 }
 
 export function setupFavoritesPage({ listElement, sectionElement }) {
 	if (!listElement) {
 		return
+	}
+
+	const getEpisodeNumber = (episodeCode) => {
+		const match = String(episodeCode).match(/^S\d+E(\d+)$/)
+		return match ? Number(match[1]) : 'Onbekend'
+	}
+
+	const getSeasonNumber = (episodeCode) => {
+		const match = String(episodeCode).match(/^S(\d+)E\d+$/)
+		return match ? Number(match[1]) : 'Onbekend'
 	}
 
 	const renderFavorites = () => {
@@ -118,9 +149,43 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 		listElement.innerHTML = favorites
 			.map(
 				(favorite) => {
+					const ignoredKeysByType = {
+						character: ['id', 'url', 'image', 'name', 'created', 'episode'],
+						location: ['id', 'url', 'name', 'created', 'residents'],
+						episode: ['id', 'url', 'characters', 'created'],
+					}
+
 					const entries = favorite.entityData
-						? Object.entries(favorite.entityData).filter(([key]) => !['id', 'url', 'image', 'name', 'created'].includes(key))
+						? Object.entries(favorite.entityData).filter(
+							([key]) => !(ignoredKeysByType[favorite.entityType] || ['id', 'url', 'image', 'name', 'created']).includes(key),
+						)
 						: []
+
+					if (favorite.entityType === 'episode' && favorite.entityData) {
+						return `
+							<article class="character-card">
+								<div class="character-info">
+									<h3>${renderTextValue(favorite.entityName)}</h3>
+									${renderDefinitionList([
+										{ label: 'Code', value: renderTextValue(favorite.entityData.episode) },
+										{ label: 'Air date', value: renderTextValue(favorite.entityData.air_date) },
+										{ label: 'Seizoen', value: renderTextValue(getSeasonNumber(favorite.entityData.episode)) },
+										{ label: 'Episode', value: renderTextValue(getEpisodeNumber(favorite.entityData.episode)) },
+										{ label: 'Aantal karakters', value: renderTextValue(favorite.entityData.characters?.length || 0) },
+									])}
+									<button
+										type="button"
+										class="favorite-button favorite-button--remove"
+										data-favorite-remove="true"
+										data-favorite-type="${favorite.entityType}"
+										data-favorite-id="${favorite.entityId}"
+									>
+										Verwijderen
+									</button>
+								</div>
+							</article>
+						`
+					}
 
 					if (favorite.entityData) {
 						return `
@@ -134,6 +199,15 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 											value: renderTextValue(value),
 										})),
 									)}
+									<button
+										type="button"
+										class="favorite-button favorite-button--remove"
+										data-favorite-remove="true"
+										data-favorite-type="${favorite.entityType}"
+										data-favorite-id="${favorite.entityId}"
+									>
+										Verwijderen
+									</button>
 								</div>
 							</article>
 						`
@@ -154,8 +228,22 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 
 	renderFavorites()
 
+	document.addEventListener('favorites-changed', renderFavorites)
+
 	if (sectionElement) {
 		sectionElement.addEventListener('click', (event) => {
+			const removeButton = event.target.closest('[data-favorite-remove="true"]')
+
+			if (removeButton) {
+				removeFavorite({
+					entityType: removeButton.dataset.favoriteType,
+					entityId: removeButton.dataset.favoriteId,
+				})
+
+				renderFavorites()
+				return
+			}
+
 			const favoriteButton = event.target.closest('[data-favorite-type]')
 
 			if (!favoriteButton) {
@@ -166,6 +254,7 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 				entityType: favoriteButton.dataset.favoriteType,
 				entityId: favoriteButton.dataset.favoriteId,
 				entityName: favoriteButton.dataset.favoriteName,
+				entityData: getFavoriteDataFromButton(favoriteButton),
 			})
 
 			renderFavorites()

@@ -193,6 +193,10 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 				entityData: getFavoriteDataFromButton(favoriteButton),
 			})
 		})
+
+		document.addEventListener('favorites-changed', () => {
+			renderEpisodes()
+		})
 	} catch (error) {
 		listElement.innerHTML = '<p>De episodes konden niet worden geladen.</p>'
 		console.error(error)
