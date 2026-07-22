@@ -4,16 +4,25 @@ import { setupEpisodesList } from './pages/episodes.js'
 import { setupFavoritesPage } from './pages/favorites.js'
 import { setupLocationList } from './pages/location.js'
 
+const storedTheme = localStorage.getItem('rick-and-morty-theme')
+const preferredTheme = storedTheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+
+document.documentElement.dataset.theme = preferredTheme
+
 document.querySelector('#app').innerHTML = `
   <main class="page-shell">
     <header class="topbar">
-      <div>
+      <button class="theme-toggle" type="button" data-theme-toggle>
+        Wissel naar licht thema
+      </button>
+
+      <div class="topbar-copy">
         <p class="eyebrow">Rick and Morty</p>
         <h1>Ontdek personages, locaties en episodes</h1>
       </div>
     </header>
 
-    <section class="search-area" aria-label="Zoeken in de app">
+    <form class="search-area" id="search-form" aria-label="Zoeken in de app" novalidate>
       <label class="sr-only" for="search-input">Zoek een karakter, locatie of episode</label>
       <input
         id="search-input"
@@ -21,8 +30,12 @@ document.querySelector('#app').innerHTML = `
         type="search"
         name="search"
         placeholder="Zoek een karakter, locatie of episode"
+        minlength="2"
+        required
       />
-      <button class="search-button" type="button">Zoeken</button>
+      <button class="search-button" type="submit">Zoeken</button>
+
+      <p class="form-feedback" id="search-feedback" aria-live="polite"></p>
 
       <ul class="page-links" aria-label="Snelle links naar pagina's">
         <li><a href="#characters" data-page-link="characters">Personages</a></li>
@@ -30,7 +43,7 @@ document.querySelector('#app').innerHTML = `
         <li><a href="#episodes" data-page-link="episodes">Episodes</a></li>
         <li><a href="#favorites" data-page-link="favorites">Favorieten</a></li>
       </ul>
-    </section>
+    </form>
 
     <section class="characters-section page-panel is-hidden" id="characters" data-page-panel="characters">
       <div class="characters-header">
@@ -160,6 +173,40 @@ setupFavoritesPage({
 
 const pageLinks = document.querySelectorAll('[data-page-link]')
 const pagePanels = document.querySelectorAll('[data-page-panel]')
+const themeToggle = document.querySelector('[data-theme-toggle]')
+const searchForm = document.querySelector('#search-form')
+const searchInput = document.querySelector('#search-input')
+const searchFeedback = document.querySelector('#search-feedback')
+
+const favoriteCardObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible')
+      }
+    })
+  },
+  {
+    threshold: 0.18,
+    rootMargin: '0px 0px -8% 0px',
+  },
+)
+
+const observeCards = () => {
+  document.querySelectorAll('.character-card:not(.is-visible)').forEach((card) => {
+    favoriteCardObserver.observe(card)
+  })
+}
+
+const updateThemeButton = () => {
+  const currentTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
+
+  if (themeToggle) {
+    themeToggle.textContent = currentTheme === 'dark' ? 'Wissel naar licht thema' : 'Wissel naar donker thema'
+  }
+}
+
+updateThemeButton()
 
 const showPage = (pageName) => {
   pagePanels.forEach((panel) => {
@@ -169,6 +216,8 @@ const showPage = (pageName) => {
   pageLinks.forEach((link) => {
     link.classList.toggle('is-active', link.dataset.pageLink === pageName)
   })
+
+  requestAnimationFrame(observeCards)
 }
 
 pageLinks.forEach((link) => {
@@ -180,4 +229,36 @@ pageLinks.forEach((link) => {
 
     document.querySelector(`[data-page-panel="${pageName}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })
+})
+
+themeToggle?.addEventListener('click', () => {
+  const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+  document.documentElement.dataset.theme = nextTheme
+  localStorage.setItem('rick-and-morty-theme', nextTheme)
+  updateThemeButton()
+})
+
+searchForm?.addEventListener('submit', (event) => {
+  event.preventDefault()
+
+  const searchValue = searchInput.value.trim()
+
+  if (searchValue.length < 2) {
+    searchInput.setCustomValidity('Vul minstens 2 tekens in.')
+    searchInput.reportValidity()
+    searchFeedback.textContent = 'Vul minstens 2 tekens in.'
+    return
+  }
+
+  searchInput.setCustomValidity('')
+  searchFeedback.textContent = `Zoekterm "${searchValue}" is geldig.`
+})
+
+searchInput?.addEventListener('input', () => {
+  searchInput.setCustomValidity('')
+  searchFeedback.textContent = ''
+})
+
+document.addEventListener('favorites-changed', () => {
+  requestAnimationFrame(observeCards)
 })
