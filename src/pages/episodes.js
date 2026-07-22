@@ -1,4 +1,4 @@
-import { createFavoriteButton } from './favorites.js'
+import { createFavoriteButton, toggleFavorite } from './favorites.js'
 
 const EPISODE_API_URL = 'https://rickandmortyapi.com/api/episode'
 
@@ -119,6 +119,20 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 		filterElement.addEventListener('input', renderEpisodes)
 		seasonElement.addEventListener('change', renderEpisodes)
 		sortElement.addEventListener('change', renderEpisodes)
+
+		listElement.addEventListener('click', (event) => {
+			const favoriteButton = event.target.closest('[data-favorite-type]')
+
+			if (!favoriteButton) {
+				return
+			}
+
+			toggleFavorite({
+				entityType: favoriteButton.dataset.favoriteType,
+				entityId: favoriteButton.dataset.favoriteId,
+				entityName: favoriteButton.dataset.favoriteName,
+			})
+		})
 	} catch (error) {
 		listElement.innerHTML = '<p>De episodes konden niet worden geladen.</p>'
 		console.error(error)

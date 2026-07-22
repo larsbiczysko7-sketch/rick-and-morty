@@ -1,4 +1,4 @@
-import { createFavoriteButton } from './favorites.js'
+import { createFavoriteButton, toggleFavorite } from './favorites.js'
 
 const CHARACTER_API_URL = 'https://rickandmortyapi.com/api/character?page=1'
 
@@ -51,6 +51,20 @@ export async function setupCharacterList({ listElement, filterElement }) {
 
     filterElement.addEventListener('input', (event) => {
       renderCharacters(event.target.value)
+    })
+
+    listElement.addEventListener('click', (event) => {
+      const favoriteButton = event.target.closest('[data-favorite-type]')
+
+      if (!favoriteButton) {
+        return
+      }
+
+      toggleFavorite({
+        entityType: favoriteButton.dataset.favoriteType,
+        entityId: favoriteButton.dataset.favoriteId,
+        entityName: favoriteButton.dataset.favoriteName,
+      })
     })
   } catch (error) {
     listElement.innerHTML = '<p>De karakters konden niet worden geladen.</p>'

@@ -1,6 +1,7 @@
 import './style.css'
 import { setupCharacterList } from './pages/characters.js'
 import { setupEpisodesList } from './pages/episodes.js'
+import { setupFavoritesPage } from './pages/favorites.js'
 import { setupLocationList } from './pages/location.js'
 
 document.querySelector('#app').innerHTML = `
@@ -119,6 +120,17 @@ document.querySelector('#app').innerHTML = `
 
       <div id="location-list" class="characters-list" aria-live="polite"></div>
     </section>
+
+    <section class="characters-section" id="favorites">
+      <div class="characters-header">
+        <div>
+          <p class="eyebrow">Favorieten</p>
+          <h2>Opgeslagen items</h2>
+        </div>
+      </div>
+
+      <div id="favorites-list" class="characters-list" aria-live="polite"></div>
+    </section>
   </main>
 `
 
@@ -139,4 +151,9 @@ setupLocationList({
   filterElement: document.querySelector('#location-filter'),
   typeElement: document.querySelector('#location-type-filter'),
   sortElement: document.querySelector('#location-sort'),
+})
+
+setupFavoritesPage({
+  listElement: document.querySelector('#favorites-list'),
+  sectionElement: document.querySelector('#favorites'),
 })
