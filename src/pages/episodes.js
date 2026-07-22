@@ -1,4 +1,59 @@
-import { createFavoriteButton, toggleFavorite } from './favorites.js'
+import { createFavoriteButton, getFavoriteDataFromButton, toggleFavorite } from './favorites.js'
+
+const escapeHtml = (value) =>
+	String(value)
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#39;')
+
+const renderDefinitionList = (items) => `
+	<dl class="api-details">
+		${items
+			.map(
+				({ label, value }) => `
+					<div class="api-details-row">
+						<dt>${escapeHtml(label)}</dt>
+						<dd>${value}</dd>
+					</div>
+				`,
+			)
+			.join('')}
+	</dl>
+`
+
+const renderListValue = (items) => {
+	if (!Array.isArray(items) || !items.length) {
+		return '<p>Geen gegevens</p>'
+	}
+
+	return `
+		<details class="api-values">
+			<summary>${items.length} items</summary>
+			<ul>
+				${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+			</ul>
+		</details>
+	`
+}
+
+const renderTextValue = (value) => {
+	if (Array.isArray(value)) {
+		return renderListValue(value)
+	}
+
+	if (value === null || value === undefined || value === '') {
+		return 'Onbekend'
+	}
+
+	if (typeof value === 'object') {
+		const nestedValue = value.name || value.title || value.type || value.dimension || value.url || JSON.stringify(value)
+		return escapeHtml(nestedValue)
+	}
+
+	return escapeHtml(value)
+}
 
 const EPISODE_API_URL = 'https://rickandmortyapi.com/api/episode'
 
@@ -97,14 +152,18 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 								<article class="character-card">
 									<div class="character-info">
 										<h3>${episode.name}</h3>
-										<p><strong>Code:</strong> ${episode.episode}</p>
-										<p><strong>Air date:</strong> ${formatDate(episode.air_date)}</p>
-										<p><strong>Seizoen:</strong> ${getSeasonNumber(episode.episode)}</p>
-										<p><strong>Episode:</strong> ${getEpisodeNumber(episode.episode)}</p>
+										${renderDefinitionList([
+											{ label: 'Code', value: renderTextValue(episode.episode) },
+											{ label: 'Air date', value: renderTextValue(formatDate(episode.air_date)) },
+											{ label: 'Seizoen', value: renderTextValue(getSeasonNumber(episode.episode)) },
+											{ label: 'Episode', value: renderTextValue(getEpisodeNumber(episode.episode)) },
+											{ label: 'Karakters', value: renderListValue(episode.characters) },
+										])}
 										${createFavoriteButton({
 											entityType: 'episode',
 											entityId: episode.id,
 											entityName: episode.name,
+											entityData: episode,
 										})}
 									</div>
 								</article>
@@ -131,6 +190,7 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 				entityType: favoriteButton.dataset.favoriteType,
 				entityId: favoriteButton.dataset.favoriteId,
 				entityName: favoriteButton.dataset.favoriteName,
+				entityData: getFavoriteDataFromButton(favoriteButton),
 			})
 		})
 	} catch (error) {

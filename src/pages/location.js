@@ -1,4 +1,59 @@
-import { createFavoriteButton, toggleFavorite } from './favorites.js'
+import { createFavoriteButton, getFavoriteDataFromButton, toggleFavorite } from './favorites.js'
+
+const escapeHtml = (value) =>
+  String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
+const renderDefinitionList = (items) => `
+  <dl class="api-details">
+    ${items
+      .map(
+        ({ label, value }) => `
+          <div class="api-details-row">
+            <dt>${escapeHtml(label)}</dt>
+            <dd>${value}</dd>
+          </div>
+        `,
+      )
+      .join('')}
+  </dl>
+`
+
+const renderListValue = (items) => {
+  if (!Array.isArray(items) || !items.length) {
+    return '<p>Geen gegevens</p>'
+  }
+
+  return `
+    <details class="api-values">
+      <summary>${items.length} items</summary>
+      <ul>
+        ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+      </ul>
+    </details>
+  `
+}
+
+const renderTextValue = (value) => {
+  if (Array.isArray(value)) {
+    return renderListValue(value)
+  }
+
+  if (value === null || value === undefined || value === '') {
+    return 'Onbekend'
+  }
+
+  if (typeof value === 'object') {
+    const nestedValue = value.name || value.title || value.type || value.dimension || value.url || JSON.stringify(value)
+    return escapeHtml(nestedValue)
+  }
+
+  return escapeHtml(value)
+}
 
 const LOCATION_API_URL = 'https://rickandmortyapi.com/api/location'
 
@@ -73,14 +128,16 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
                 <article class="character-card">
                   <div class="character-info">
                     <h3>${location.name}</h3>
-                    <p><strong>Type:</strong> ${location.type || 'Onbekend'}</p>
-                    <p><strong>Dimensie:</strong> ${location.dimension || 'Onbekend'}</p>
-                    <p><strong>Bewoners:</strong> ${location.residents.length}</p>
-                    <p><strong>Gebouwd:</strong> ${location.created}</p>
+                    ${renderDefinitionList([
+                      { label: 'Type', value: renderTextValue(location.type) },
+                      { label: 'Dimensie', value: renderTextValue(location.dimension) },
+                      { label: 'Aantal gekende bewoners', value: renderTextValue(location.residents.length) },
+                    ])}
                     ${createFavoriteButton({
                       entityType: 'location',
                       entityId: location.id,
                       entityName: location.name,
+                      entityData: location,
                     })}
                   </div>
                 </article>
@@ -107,6 +164,7 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
         entityType: favoriteButton.dataset.favoriteType,
         entityId: favoriteButton.dataset.favoriteId,
         entityName: favoriteButton.dataset.favoriteName,
+        entityData: getFavoriteDataFromButton(favoriteButton),
       })
     })
   } catch (error) {

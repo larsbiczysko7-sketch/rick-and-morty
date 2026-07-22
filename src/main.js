@@ -25,14 +25,14 @@ document.querySelector('#app').innerHTML = `
       <button class="search-button" type="button">Zoeken</button>
 
       <ul class="page-links" aria-label="Snelle links naar pagina's">
-        <li><a href="#characters">Personages</a></li>
-        <li><a href="#location">Locatie</a></li>
-        <li><a href="#episodes">Episodes</a></li>
-        <li><a href="#favorites">Favorieten</a></li>
+        <li><a href="#characters" data-page-link="characters">Personages</a></li>
+        <li><a href="#location" data-page-link="location">Locatie</a></li>
+        <li><a href="#episodes" data-page-link="episodes">Episodes</a></li>
+        <li><a href="#favorites" data-page-link="favorites">Favorieten</a></li>
       </ul>
     </section>
 
-    <section class="characters-section" id="characters">
+    <section class="characters-section page-panel is-hidden" id="characters" data-page-panel="characters">
       <div class="characters-header">
         <div>
           <p class="eyebrow">Personages</p>
@@ -51,7 +51,7 @@ document.querySelector('#app').innerHTML = `
       <div id="characters-list" class="characters-list" aria-live="polite"></div>
     </section>
 
-    <section class="characters-section" id="episodes">
+    <section class="characters-section page-panel is-hidden" id="episodes" data-page-panel="episodes">
       <div class="characters-header">
         <div>
           <p class="eyebrow">Episodes</p>
@@ -87,7 +87,7 @@ document.querySelector('#app').innerHTML = `
       <div id="episodes-list" class="characters-list" aria-live="polite"></div>
     </section>
 
-    <section class="characters-section" id="location">
+    <section class="characters-section page-panel is-hidden" id="location" data-page-panel="location">
       <div class="characters-header">
         <div>
           <p class="eyebrow">Locatie</p>
@@ -121,7 +121,7 @@ document.querySelector('#app').innerHTML = `
       <div id="location-list" class="characters-list" aria-live="polite"></div>
     </section>
 
-    <section class="characters-section" id="favorites">
+    <section class="characters-section page-panel is-hidden" id="favorites" data-page-panel="favorites">
       <div class="characters-header">
         <div>
           <p class="eyebrow">Favorieten</p>
@@ -156,4 +156,28 @@ setupLocationList({
 setupFavoritesPage({
   listElement: document.querySelector('#favorites-list'),
   sectionElement: document.querySelector('#favorites'),
+})
+
+const pageLinks = document.querySelectorAll('[data-page-link]')
+const pagePanels = document.querySelectorAll('[data-page-panel]')
+
+const showPage = (pageName) => {
+  pagePanels.forEach((panel) => {
+    panel.classList.toggle('is-hidden', panel.dataset.pagePanel !== pageName)
+  })
+
+  pageLinks.forEach((link) => {
+    link.classList.toggle('is-active', link.dataset.pageLink === pageName)
+  })
+}
+
+pageLinks.forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault()
+
+    const pageName = link.dataset.pageLink
+    showPage(pageName)
+
+    document.querySelector(`[data-page-panel="${pageName}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 })

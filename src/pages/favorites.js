@@ -1,6 +1,56 @@
+const escapeHtml = (value) =>
+	String(value)
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#39;')
+
+const renderDefinitionList = (items) => `
+	<dl class="api-details">
+		${items
+			.map(
+				({ label, value }) => `
+					<div class="api-details-row">
+						<dt>${escapeHtml(label)}</dt>
+						<dd>${value}</dd>
+					</div>
+				`,
+			)
+			.join('')}
+	</dl>
+`
+
+const renderTextValue = (value) => {
+	if (value === null || value === undefined || value === '') {
+		return 'Onbekend'
+	}
+
+	if (typeof value === 'object') {
+		const nestedValue = value.name || value.title || value.type || value.dimension || value.url || JSON.stringify(value)
+		return escapeHtml(nestedValue)
+	}
+
+	return escapeHtml(value)
+}
+
 export const FAVORITES_STORAGE_KEY = 'rick-and-morty-favorites'
 
-export function createFavoriteButton({ entityType, entityId, entityName }) {
+const encodeDataAttribute = (value) => encodeURIComponent(JSON.stringify(value ?? null))
+
+const decodeDataAttribute = (value) => {
+	if (!value) {
+		return null
+	}
+
+	try {
+		return JSON.parse(decodeURIComponent(value))
+	} catch {
+		return null
+	}
+}
+
+export function createFavoriteButton({ entityType, entityId, entityName, entityData }) {
 	return `
 		<button
 			type="button"
@@ -8,6 +58,7 @@ export function createFavoriteButton({ entityType, entityId, entityName }) {
 			data-favorite-type="${entityType}"
 			data-favorite-id="${entityId}"
 			data-favorite-name="${entityName}"
+			data-favorite-data="${encodeDataAttribute(entityData)}"
 		>
 			Favoriet
 		</button>
@@ -35,7 +86,7 @@ const writeFavorites = (favorites) => {
 
 export const getFavorites = () => readFavorites()
 
-export const toggleFavorite = ({ entityType, entityId, entityName }) => {
+export const toggleFavorite = ({ entityType, entityId, entityName, entityData = null }) => {
 	const favorites = readFavorites()
 	const isAlreadyFavorite = favorites.some(
 		(favorite) => favorite.entityType === entityType && String(favorite.entityId) === String(entityId),
@@ -45,7 +96,7 @@ export const toggleFavorite = ({ entityType, entityId, entityName }) => {
 		? favorites.filter(
 				(favorite) => !(favorite.entityType === entityType && String(favorite.entityId) === String(entityId)),
 		  )
-		: [...favorites, { entityType, entityId, entityName }]
+		: [...favorites, { entityType, entityId, entityName, entityData }]
 
 	writeFavorites(nextFavorites)
 	return nextFavorites
@@ -66,14 +117,37 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 
 		listElement.innerHTML = favorites
 			.map(
-				(favorite) => `
-					<article class="character-card">
-						<div class="character-info">
-							<h3>${favorite.entityName}</h3>
-							<p><strong>Type:</strong> ${favorite.entityType}</p>
-						</div>
-					</article>
-				`,
+				(favorite) => {
+					const entries = favorite.entityData
+						? Object.entries(favorite.entityData).filter(([key]) => !['id', 'url', 'image', 'name', 'created'].includes(key))
+						: []
+
+					if (favorite.entityData) {
+						return `
+							<article class="character-card">
+								${favorite.entityData.image ? `<img src="${renderTextValue(favorite.entityData.image)}" alt="${renderTextValue(favorite.entityName)}" class="character-image" />` : ''}
+								<div class="character-info">
+									<h3>${renderTextValue(favorite.entityName)}</h3>
+									${renderDefinitionList(
+										entries.map(([label, value]) => ({
+											label,
+											value: renderTextValue(value),
+										})),
+									)}
+								</div>
+							</article>
+						`
+					}
+
+					return `
+						<article class="character-card">
+							<div class="character-info">
+								<h3>${renderTextValue(favorite.entityName)}</h3>
+								<p><strong>Type:</strong> ${renderTextValue(favorite.entityType)}</p>
+							</div>
+						</article>
+					`
+				},
 			)
 			.join('')
 	}
@@ -104,3 +178,5 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 		}
 	})
 }
+
+export const getFavoriteDataFromButton = (buttonElement) => decodeDataAttribute(buttonElement.dataset.favoriteData)
