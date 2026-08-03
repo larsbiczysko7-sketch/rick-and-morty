@@ -102,7 +102,7 @@ De app haalt data op met fetch uit de Rick and Morty API. De gegevens worden daa
 
 ### 5. Styling en layout
 
-De app heeft een duidelijke layout met CSS. Er is gebruik gemaakt van flexbox of CSS grid. De knoppen zijn duidelijk en de website is responsive.
+De app heeft een duidelijke layout met CSS. Er is gebruik gemaakt van flexbox of CSS grid. De knoppen zijn duidelijk en de website is responsive. Je kan de applicatie zien bij /public/screenshots
 
 ### 6. Tooling en structuur
 
@@ -123,7 +123,7 @@ Dit project is gemaakt met Vite. De code is netjes verdeeld over meerdere bestan
 - src/pages/location.js
 - src/pages/favorites.js
 - src/style.css
-- public/screenshots/app-overview.svg
+- public/screenshots
 
 ## Screenshots
 
