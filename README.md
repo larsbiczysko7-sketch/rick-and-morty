@@ -129,7 +129,7 @@ Dit project is gemaakt met Vite. De code is netjes verdeeld over meerdere bestan
 
 Hieronder staat een voorbeeld van de app:
 
-![Applicatie-overzicht](public/screenshots/app-overview.svg)
+![Applicatie-overzicht](public/screenshots)
 
 ## Bronnen
 
