@@ -127,9 +127,15 @@ Dit project is gemaakt met Vite. De code is netjes verdeeld over meerdere bestan
 
 ## Screenshots
 
-Hieronder staat een voorbeeld van de app:
+Hieronder staan de screenshots uit de map public/screenshots. Elke afbeelding laat een deel van de app zien en verklaart wat je kunt zien.
 
-![Applicatie-overzicht](public/screenshots)
+- [Hoofd_paginaDonkerThema.png](public/screenshots/Hoofd_paginaDonkerThema.png) — De startpagina in het donkere thema met de hoofdbeschrijving en de navigatie.
+- [Hoofd_paginaLichThema.png](public/screenshots/Hoofd_paginaLichThema.png) — De startpagina in het lichte thema, zodat het verschil tussen beide thema’s zichtbaar is.
+- [Karakters.png](public/screenshots/Karakters.png) — De personagespagina met verschillende karakterkaarten en de filteropties.
+- [Locatie_pagina.png](public/screenshots/Locatie_pagina.png) — De locatiespagina met een overzicht van locaties en de bijbehorende informatie.
+- [Episodes_pagina.png](public/screenshots/Episodes_pagina.png) — De episodespagina met afleveringen, seizoenen en sorteeropties.
+- [Favorieten_pagina.png](public/screenshots/Favorieten_pagina.png) — De favorietenpagina met de opgeslagen items die de gebruiker heeft gemarkeerd.
+- [Filter_test.png](public/screenshots/Filter_test.png) — Een voorbeeld van de filters in actie, waarbij de resultaten worden beperkt door de gekozen opties.
 
 ## Bronnen
 
