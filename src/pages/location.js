@@ -121,30 +121,35 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
         return left.name.localeCompare(right.name)
       })
 
-      listElement.innerHTML = sortedLocations.length
-        ? sortedLocations
-            .map(
-              (location) => `
-                <article class="character-card">
-                  <div class="character-info">
-                    <h3>${location.name}</h3>
-                    ${renderDefinitionList([
-                      { label: 'Type', value: renderTextValue(location.type) },
-                      { label: 'Dimensie', value: renderTextValue(location.dimension) },
-                      { label: 'Aantal gekende bewoners', value: renderTextValue(location.residents.length) },
-                    ])}
-                    ${createFavoriteButton({
-                      entityType: 'location',
-                      entityId: location.id,
-                      entityName: location.name,
-                      entityData: location,
-                    })}
-                  </div>
-                </article>
-              `,
-            )
-            .join('')
-        : '<p>Geen locaties gevonden voor deze filters.</p>'
+      const hasActiveFilters = query.length > 0 || selectedType !== 'all' || sortValue !== 'name-asc'
+
+      listElement.innerHTML = `
+        ${hasActiveFilters ? '<div class="filter-toolbar"><button type="button" class="filter-reset-button" data-reset-filter="locations">Wis filters</button></div>' : ''}
+        ${sortedLocations.length
+          ? sortedLocations
+              .map(
+                (location) => `
+                  <article class="character-card">
+                    <div class="character-info">
+                      <h3>${location.name}</h3>
+                      ${renderDefinitionList([
+                        { label: 'Type', value: renderTextValue(location.type) },
+                        { label: 'Dimensie', value: renderTextValue(location.dimension) },
+                        { label: 'Aantal gekende bewoners', value: renderTextValue(location.residents.length) },
+                      ])}
+                      ${createFavoriteButton({
+                        entityType: 'location',
+                        entityId: location.id,
+                        entityName: location.name,
+                        entityData: location,
+                      })}
+                    </div>
+                  </article>
+                `,
+              )
+              .join('')
+          : '<p class="empty-state">Geen locaties gevonden voor deze filters.</p>'}
+      `
     }
 
     renderLocations()
@@ -154,6 +159,16 @@ export async function setupLocationList({ listElement, filterElement, typeElemen
     sortElement.addEventListener('change', renderLocations)
 
     listElement.addEventListener('click', (event) => {
+      const resetButton = event.target.closest('[data-reset-filter="locations"]')
+
+      if (resetButton) {
+        filterElement.value = ''
+        typeElement.value = 'all'
+        sortElement.value = 'name-asc'
+        renderLocations()
+        return
+      }
+
       const favoriteButton = event.target.closest('[data-favorite-type]')
 
       if (!favoriteButton) {

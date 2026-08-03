@@ -145,32 +145,37 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 				return sortValue === 'number-desc' ? rightEpisode - leftEpisode : leftEpisode - rightEpisode
 			})
 
-			listElement.innerHTML = sortedEpisodes.length
-				? sortedEpisodes
-						.map(
-							(episode) => `
-								<article class="character-card">
-									<div class="character-info">
-										<h3>${episode.name}</h3>
-										${renderDefinitionList([
-											{ label: 'Code', value: renderTextValue(episode.episode) },
-											{ label: 'Air date', value: renderTextValue(formatDate(episode.air_date)) },
-											{ label: 'Seizoen', value: renderTextValue(getSeasonNumber(episode.episode)) },
-											{ label: 'Episode', value: renderTextValue(getEpisodeNumber(episode.episode)) },
-											{ label: 'Karakters', value: renderListValue(episode.characters) },
-										])}
-										${createFavoriteButton({
-											entityType: 'episode',
-											entityId: episode.id,
-											entityName: episode.name,
-											entityData: episode,
-										})}
-									</div>
-								</article>
-							`,
-						)
-						.join('')
-				: '<p>Geen episodes gevonden voor deze filters.</p>'
+			const hasActiveFilters = query.length > 0 || selectedSeason !== 'all' || sortValue !== 'number-asc'
+
+			listElement.innerHTML = `
+				${hasActiveFilters ? '<div class="filter-toolbar"><button type="button" class="filter-reset-button" data-reset-filter="episodes">Wis filters</button></div>' : ''}
+				${sortedEpisodes.length
+					? sortedEpisodes
+							.map(
+								(episode) => `
+									<article class="character-card">
+										<div class="character-info">
+											<h3>${episode.name}</h3>
+											${renderDefinitionList([
+												{ label: 'Code', value: renderTextValue(episode.episode) },
+												{ label: 'Air date', value: renderTextValue(formatDate(episode.air_date)) },
+												{ label: 'Seizoen', value: renderTextValue(getSeasonNumber(episode.episode)) },
+												{ label: 'Episode', value: renderTextValue(getEpisodeNumber(episode.episode)) },
+												{ label: 'Karakters', value: renderListValue(episode.characters) },
+											])}
+											${createFavoriteButton({
+												entityType: 'episode',
+												entityId: episode.id,
+												entityName: episode.name,
+												entityData: episode,
+											})}
+										</div>
+									</article>
+								`,
+							)
+							.join('')
+					: '<p class="empty-state">Geen episodes gevonden voor deze filters.</p>'}
+			`
 		}
 
 		renderEpisodes()
@@ -180,6 +185,16 @@ export async function setupEpisodesList({ listElement, filterElement, seasonElem
 		sortElement.addEventListener('change', renderEpisodes)
 
 		listElement.addEventListener('click', (event) => {
+			const resetButton = event.target.closest('[data-reset-filter="episodes"]')
+
+			if (resetButton) {
+				filterElement.value = ''
+				seasonElement.value = 'all'
+				sortElement.value = 'number-asc'
+				renderEpisodes()
+				return
+			}
+
 			const favoriteButton = event.target.closest('[data-favorite-type]')
 
 			if (!favoriteButton) {

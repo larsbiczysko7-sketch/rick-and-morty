@@ -22,28 +22,12 @@ document.querySelector('#app').innerHTML = `
       </div>
     </header>
 
-    <form class="search-area" id="search-form" aria-label="Zoeken in de app" novalidate>
-      <label class="sr-only" for="search-input">Zoek een karakter, locatie of episode</label>
-      <input
-        id="search-input"
-        class="search-input"
-        type="search"
-        name="search"
-        placeholder="Zoek een karakter, locatie of episode"
-        minlength="2"
-        required
-      />
-      <button class="search-button" type="submit">Zoeken</button>
-
-      <p class="form-feedback" id="search-feedback" aria-live="polite"></p>
-
-      <ul class="page-links" aria-label="Snelle links naar pagina's">
-        <li><a href="#characters" data-page-link="characters">Personages</a></li>
-        <li><a href="#location" data-page-link="location">Locatie</a></li>
-        <li><a href="#episodes" data-page-link="episodes">Episodes</a></li>
-        <li><a href="#favorites" data-page-link="favorites">Favorieten</a></li>
-      </ul>
-    </form>
+    <nav class="page-links" aria-label="Snelle links naar pagina's">
+      <a href="#characters" data-page-link="characters">Personages</a>
+      <a href="#location" data-page-link="location">Locatie</a>
+      <a href="#episodes" data-page-link="episodes">Episodes</a>
+      <a href="#favorites" data-page-link="favorites">Favorieten</a>
+    </nav>
 
     <section class="characters-section page-panel is-hidden" id="characters" data-page-panel="characters">
       <div class="characters-header">
@@ -52,13 +36,30 @@ document.querySelector('#app').innerHTML = `
           <h2>Alle karakters</h2>
         </div>
 
-        <label class="sr-only" for="character-filter">Filter karakters</label>
-        <input
-          id="character-filter"
-          class="search-input"
-          type="search"
-          placeholder="Filter op naam, soort of status"
-        />
+        <div class="character-filters">
+          <label class="sr-only" for="character-name-filter">Zoek op naam</label>
+          <input
+            id="character-name-filter"
+            class="search-input"
+            type="search"
+            placeholder="Zoek op naam"
+          />
+
+          <label class="sr-only" for="character-status-filter">Filter op status</label>
+          <select id="character-status-filter" class="search-input">
+            <option value="all">Alle statussen</option>
+          </select>
+
+          <label class="sr-only" for="character-species-filter">Filter op soort</label>
+          <select id="character-species-filter" class="search-input">
+            <option value="all">Alle soorten</option>
+          </select>
+
+          <label class="sr-only" for="character-gender-filter">Filter op geslacht</label>
+          <select id="character-gender-filter" class="search-input">
+            <option value="all">Alle geslachten</option>
+          </select>
+        </div>
       </div>
 
       <div id="characters-list" class="characters-list" aria-live="polite"></div>
@@ -149,7 +150,10 @@ document.querySelector('#app').innerHTML = `
 
 setupCharacterList({
   listElement: document.querySelector('#characters-list'),
-  filterElement: document.querySelector('#character-filter'),
+  nameElement: document.querySelector('#character-name-filter'),
+  statusElement: document.querySelector('#character-status-filter'),
+  speciesElement: document.querySelector('#character-species-filter'),
+  genderElement: document.querySelector('#character-gender-filter'),
 })
 
 setupEpisodesList({
@@ -174,9 +178,9 @@ setupFavoritesPage({
 const pageLinks = document.querySelectorAll('[data-page-link]')
 const pagePanels = document.querySelectorAll('[data-page-panel]')
 const themeToggle = document.querySelector('[data-theme-toggle]')
-const searchForm = document.querySelector('#search-form')
-const searchInput = document.querySelector('#search-input')
-const searchFeedback = document.querySelector('#search-feedback')
+const characterFilter = document.querySelector('#character-filter')
+const episodeFilter = document.querySelector('#episode-filter')
+const locationFilter = document.querySelector('#location-filter')
 
 const favoriteCardObserver = new IntersectionObserver(
   (entries) => {
@@ -236,27 +240,6 @@ themeToggle?.addEventListener('click', () => {
   document.documentElement.dataset.theme = nextTheme
   localStorage.setItem('rick-and-morty-theme', nextTheme)
   updateThemeButton()
-})
-
-searchForm?.addEventListener('submit', (event) => {
-  event.preventDefault()
-
-  const searchValue = searchInput.value.trim()
-
-  if (searchValue.length < 2) {
-    searchInput.setCustomValidity('Vul minstens 2 tekens in.')
-    searchInput.reportValidity()
-    searchFeedback.textContent = 'Vul minstens 2 tekens in.'
-    return
-  }
-
-  searchInput.setCustomValidity('')
-  searchFeedback.textContent = `Zoekterm "${searchValue}" is geldig.`
-})
-
-searchInput?.addEventListener('input', () => {
-  searchInput.setCustomValidity('')
-  searchFeedback.textContent = ''
 })
 
 document.addEventListener('favorites-changed', () => {

@@ -34,6 +34,18 @@ const renderTextValue = (value) => {
 	return escapeHtml(value)
 }
 
+const renderRemoveFavoriteButton = (favorite) => `
+	<button
+		type="button"
+		class="favorite-button favorite-button--remove"
+		data-favorite-remove="true"
+		data-favorite-type="${favorite.entityType}"
+		data-favorite-id="${favorite.entityId}"
+	>
+		Verwijderen
+	</button>
+`
+
 export const FAVORITES_STORAGE_KEY = 'rick-and-morty-favorites'
 
 const encodeDataAttribute = (value) => encodeURIComponent(JSON.stringify(value ?? null))
@@ -173,15 +185,7 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 										{ label: 'Episode', value: renderTextValue(getEpisodeNumber(favorite.entityData.episode)) },
 										{ label: 'Aantal karakters', value: renderTextValue(favorite.entityData.characters?.length || 0) },
 									])}
-									<button
-										type="button"
-										class="favorite-button favorite-button--remove"
-										data-favorite-remove="true"
-										data-favorite-type="${favorite.entityType}"
-										data-favorite-id="${favorite.entityId}"
-									>
-										Verwijderen
-									</button>
+									${renderRemoveFavoriteButton(favorite)}
 								</div>
 							</article>
 						`
@@ -199,15 +203,7 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 											value: renderTextValue(value),
 										})),
 									)}
-									<button
-										type="button"
-										class="favorite-button favorite-button--remove"
-										data-favorite-remove="true"
-										data-favorite-type="${favorite.entityType}"
-										data-favorite-id="${favorite.entityId}"
-									>
-										Verwijderen
-									</button>
+									${renderRemoveFavoriteButton(favorite)}
 								</div>
 							</article>
 						`
@@ -218,6 +214,7 @@ export function setupFavoritesPage({ listElement, sectionElement }) {
 							<div class="character-info">
 								<h3>${renderTextValue(favorite.entityName)}</h3>
 								<p><strong>Type:</strong> ${renderTextValue(favorite.entityType)}</p>
+								${renderRemoveFavoriteButton(favorite)}
 							</div>
 						</article>
 					`
