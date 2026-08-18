@@ -178,9 +178,46 @@ setupFavoritesPage({
 const pageLinks = document.querySelectorAll('[data-page-link]')
 const pagePanels = document.querySelectorAll('[data-page-panel]')
 const themeToggle = document.querySelector('[data-theme-toggle]')
-const characterFilter = document.querySelector('#character-filter')
+const characterNameFilter = document.querySelector('#character-name-filter')
 const episodeFilter = document.querySelector('#episode-filter')
 const locationFilter = document.querySelector('#location-filter')
+
+const searchValidationPattern = /^[A-Za-z0-9\s'.,:()&/-]*$/
+
+const setupSearchValidation = (inputElement, { maxLength = 60 } = {}) => {
+  if (!inputElement) {
+    return
+  }
+
+  inputElement.maxLength = maxLength
+
+  inputElement.addEventListener('input', () => {
+    const isWithinLimit = inputElement.value.length <= maxLength
+    const hasAllowedCharacters = searchValidationPattern.test(inputElement.value)
+
+    if (isWithinLimit && hasAllowedCharacters) {
+      inputElement.setCustomValidity('')
+      return
+    }
+
+    if (!isWithinLimit) {
+      inputElement.setCustomValidity(`Gebruik maximaal ${maxLength} tekens.`)
+      inputElement.reportValidity()
+      return
+    }
+
+    inputElement.setCustomValidity('Gebruik enkel letters, cijfers, spaties en basis leestekens.')
+    inputElement.reportValidity()
+  })
+
+  inputElement.addEventListener('blur', () => {
+    inputElement.reportValidity()
+  })
+}
+
+setupSearchValidation(characterNameFilter)
+setupSearchValidation(episodeFilter)
+setupSearchValidation(locationFilter)
 
 const favoriteCardObserver = new IntersectionObserver(
   (entries) => {
@@ -201,6 +238,21 @@ const observeCards = () => {
     favoriteCardObserver.observe(card)
   })
 }
+
+const cardContainers = ['#characters-list', '#episodes-list', '#location-list', '#favorites-list']
+  .map((selector) => document.querySelector(selector))
+  .filter(Boolean)
+
+const cardRenderObserver = new MutationObserver(() => {
+  requestAnimationFrame(observeCards)
+})
+
+cardContainers.forEach((container) => {
+  cardRenderObserver.observe(container, {
+    childList: true,
+    subtree: true,
+  })
+})
 
 const updateThemeButton = () => {
   const currentTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'

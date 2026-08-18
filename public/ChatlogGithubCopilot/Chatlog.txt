@@ -1,0 +1,213 @@
+Fix  dat elke /pages file de favoriet knop echt opslaat in Localstorage want als ik hetop duw lukt het niet
+**
+Ik kijk eerst naar de huidige `/pages`-bestanden en `favorites.js`, zodat ik kan controleren waarom de favorietenknop wel zichtbaar is maar de favoriet niet daadwerkelijk in LocalStorage wordt opgeslagen.
+
+`Reviewed 5 files`
+
+Ik ga nu de favorietenlogica uniform maken: elke favorietenknop in `characters.js`, `location.js` en `episodes.js` gebruikt dezelfde functies uit `favorites.js` en slaat de favoriete items daadwerkelijk op in LocalStorage. Bij het laden wordt ook gecontroleerd of een item al favoriet is, zodat de knop de juiste status toont.
+
+Edited
+
+favorites.js+31-4
+
+Edited
+
+characters.js+8-1
+
+Edited
+
+location.js+8-1
+
+Edited
+
+episodes.js+8-1
+
+`Thinking`
+
+De favorietenknoppen zijn nu gekoppeld aan LocalStorage; ik doe nu een build-check om te bevestigen dat alle imports, event handlers en de LocalStorage-logica zonder fouten werken.
+
+`Ran npm run build`
+
+`Thinking`
+
+Ik heb nu de favorietenfunctionaliteit in alle `/pages`-modules gelijkgetrokken:
+
+* `favorites.js` bevat nu de centrale LocalStorage-logica voor toevoegen, verwijderen en controleren van favorieten.
+* `characters.js`, `location.js` en `episodes.js` gebruiken allemaal dezelfde favorietenknop en opslaglogica.
+* Wanneer je op de favorietenknop drukt, wordt het item daadwerkelijk opgeslagen in LocalStorage.
+* Bij het opnieuw laden van de pagina wordt de opgeslagen favoriet opnieuw herkend en krijgt de knop de juiste status.
+* Een tweede klik verwijdert het item weer uit LocalStorage.
+* De build werkt nog steeds zonder fouten.
+**
+Waarom als ik mjn Character.js de objecten zo opsomt dat de image niet wilt tevoorschijn komt of half. Waar in Character.js zorg ik ervoor dat de hele foto tevoorschijn komt.
+**
+Ik kijk eerst naar de huidige `characters.js` en de styling van de character cards, zodat ik kan achterhalen waarom de afbeeldingen bij het opsommen van de objecten niet volledig zichtbaar zijn.
+
+`Reviewed 2 files`
+
+Ik ga nu de character-weergave aanpassen zodat de volledige afbeelding zichtbaar blijft. De afbeelding krijgt een vaste container en gebruikt `object-fit: contain` in plaats van `cover`, waardoor de afbeelding niet meer wordt afgesneden wanneer de characters als objecten worden opgesomd.
+
+Edited
+
+characters.js+4-1
+
+Edited
+
+characters.css+6-1
+
+`Thinking`
+
+De character-afbeeldingen zijn nu aangepast zodat de volledige foto binnen de beschikbare ruimte past. Ik doe nu een build-check om te controleren of de aanpassing geen fouten heeft veroorzaakt.
+
+`Ran npm run build`
+
+`Thinking`
+
+Ik heb nu de character-weergave aangepast:
+
+* De afbeeldingen worden niet meer afgesneden door `object-fit: cover`.
+* De volledige character-afbeelding blijft zichtbaar met `object-fit: contain`.
+* De afbeelding blijft netjes binnen de card passen wanneer meerdere objects/characters worden opgesomd.
+* De bestaande character-data en API-logica zijn verder niet aangepast.
+* De build werkt nog steeds zonder fouten.
+
+**
+Waarom kan ik niks verwijderen bij favorieten als ik op de knop duw. Fix Dit
+**
+Ik controleer eerst de huidige favorietenlogica, zodat ik een verwijderknop kan toevoegen zonder de opslag of rendering te breken.
+
+Ik voeg nu een echte verwijderknop toe aan de favorietenkaarten, zodat je opgeslagen items rechtstreeks uit de favorieten-sectie kan wegklikken.
+
+Edited
+favorites.js+31-0
+Ik controleer nu of de verwijderknop en de bestaande favorietenlogica samen nog foutloos bouwen.
+
+De favorieten zijn nu verwijderbaar. In de favorieten-sectie staat per opgeslagen item een Verwijderen-knop, en die haalt het item direct uit localStorage en uit de lijst.
+
+De build is nog steeds geslaagd.
+**
+check na of alles erin aanwezig is voor deze opdracht: wat moet nog allemaal gebeuren dit is de opdracht: **Waar extra op letten:
+**
+Dataset: Zorg ervoor dat je werkt met een degelijke dataset die voldoende diepgang en complexiteit biedt om de gevraagde functionaliteiten te kunnen demonstreren. Simpele datasets met slechts een paar velden zullen niet volstaan.
+
+README: Dit document is cruciaal voor de beoordeling. Een heldere uitleg van je project, hoe het te installeren en te gebruiken, en welke technische keuzes je gemaakt hebt, maken het verschil. Veel studenten verliezen hier onnodig punten door te oppervlakkige documentatie.
+
+Commits: Zorg voor regelmatige, betekenisvolle commits die je ontwikkelingsproces goed weerspiegelen. Eén grote commit aan het einde toont geen inzicht in versiebeheer en kost je punten.
+
+Dit is je kans om te laten zien wat je kunt presteren. Gebruik de feedback die je eerder gekregen hebt en maak er iets moois van.
+
+**
+Interactive Single Page Application**
+
+Opdracht voor Dynamic Web (HEREXAMEN)
+Projectoverzicht
+Voor het vak Advanced Web ga je een interactieve single-page webapplicatie bouwen die gebruik maakt van een API naar keuze. De applicatie moet gebruikers in staat stellen om data te verkennen, te filteren, te sorteren en op te slaan in persoonlijke collecties (favorieten).
+
+Dit project zal alle vereiste technische aspecten uit het vak Web Advanced integreren in een coherente, nuttige applicatie die echte data gebruikt. Jullie krijgen zo de kans om te werken aan een project met echte waarde en leren tegelijkertijd hoe je de verschillende JavaScript-concepten praktisch kunt toepassen.
+
+Functionele vereisten
+Jullie applicatie moet de volgende functies bevatten:
+
+Dataverzameling & -weergave:
+Haal data op van de API (API endpoint met minstens 20 op te halen objecten)
+Toon de data op een visueel aantrekkelijke manier: lijst/tabel (+ kaart of andere visuele weergave naargelang API)
+Zorg voor duidelijke details van de getoonde items (de lijstweergave toont minstens 6 kolommen)
+Interactiviteit:
+Filter functionaliteit (op type, locatie, datum, etc.)
+Zoekfunctie
+Sorteermogelijkheden
+Personalisatie:
+Gebruikers kunnen favoriete locaties/gebeurtenissen opslaan
+Data wordt bewaard tussen sessies
+Gebruikersvoorkeuren opslaan (we hebben tijdens de lessen aantal voorbeelden gezien zoals geolocatie, taalkeuze, themaswitcher, favorieten, gecachte API-data, ...)
+Gebruikerservaring:
+Responsive design
+Visueel aantrekkelijke interface
+Gebruiksvriendelijke navigatie
+Technische vereisten
+Jullie project moet ALLE onderstaande JavaScript-concepten demonstreren. Per onderdeel moeten jullie in de README documenteren waar en hoe je deze concepten hebt toegepast:
+
+DOM manipulatie:
+Elementen selecteren
+Elementen manipuleren
+Events aan elementen koppelen
+Modern JavaScript:
+Gebruik van constanten
+Template literals
+Iteratie over arrays
+Array methodes
+Arrow functions
+Conditional (ternary) operator (moderne if..else)
+Callback functions
+Promises
+Async & Await
+Observer API (1 is voldoende)
+Data & API:
+Fetch om data op te halen
+JSON manipuleren en weergeven
+Opslag & validatie:
+Formulier validatie
+Gebruik van LocalStorage
+Styling & layout:
+Basis HTML layout (flexbox of CSS grid kan hiervoor worden gebruikt)
+Basis CSS
+Gebruiksvriendelijke elementen (verwijderknoppen, icoontjes,...)
+**Tooling & structuur: **
+Project is opgezet met Vite
+Een correcte folderstructuur wordt aangehouden (gescheiden html, css en js files, src folder, dist folder, ...)
+API Keuze
+Jullie kunnen kiezen uit diverse gratis datasets op het net, zoals:
+
+Brussel APILinks to an external site.
+The Movie Database APILinks to an external site.
+Links to an external site.Pokemon APILinks to an external site.
+Rick and Morty APILinks to an external site.
+Food APILinks to an external site.
+...
+De keuze van dataset(s) is vrij, zolang jullie er een interessante gebruikerservaring mee kunnen creëren. Laat je gerust inspireren naar je persoonlijke interesses en zoek naar een goede API.
+Deliverables
+GitHub Repository met:
+
+Complete **broncode **met **comments **en bronvermelding
+Uitgebreide README met:
+
+Projectbeschrijving en functionaliteiten
+
+Gebruikte API's met links
+
+Implementatie van elke technisch vereiste (waar in de code?/lijnnummer)
+
+Installatiehandleiding
+
+Screenshots van de applicatie
+
+Gebruikte bronnen (inclusief AI chatlog)
+
+Een Github Repository wil zeggen dat meerdere commits gedaan worden naar aanleiding van het finale project. Per onderdeel én dagelijks.
+
+Werkende Demo:
+
+Code moet uitvoerbaar zijn aan de hand van de installatiehandleiding
+
+Evaluatiecriteria
+Jullie project wordt beoordeeld op:
+
+Functionaliteit: Werkt alles zoals verwacht?
+Code kwaliteit: Is de code leesbaar, goed georganiseerd en efficiënt?
+Technische vereisten: Zijn alle vereiste concepten correct geïmplementeerd?
+Gebruikerservaring: Is de interface intuïtief en aantrekkelijk?
+Structuur: Zijn er meerdere commits gedaan in de Github repository? Is de folderstructuur netjes?
+Tips voor een geslaagd project
+Begin met het verkennen van de API en bepaal welke dataset(s) jullie willen gebruiken
+
+Maak een plan: schets de interface en maak een lijst van benodigde functionaliteiten
+
+Begin eenvoudig en voeg geleidelijk meer complexiteit toe
+
+Commit regelmatig naar GitHub en gebruik betekenisvolle commit-berichten
+
+Vraag tijdig feedback aan je docent
+
+Test je applicatie op verschillende apparaten en browsers
+
+8:09 PM
