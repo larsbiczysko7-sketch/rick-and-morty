@@ -147,6 +147,7 @@ Hieronder staan de screenshots uit de map public/screenshots. Elke afbeelding la
 - AI-hulp van ChatGpt:Go 2de link (Eerste Chat Kwijt) https://chatgpt.com/share/6a84a4b5-c260-83eb-8ccd-e72a7174f10f 
 - AI-checken met Github Copilot (Gratis Versie) public/ChatlogGithubCopilot/Chatlog.txt
 
+
 ## Extra uitleg voor de leerkracht
 
 Dit project laat zien dat ik:
