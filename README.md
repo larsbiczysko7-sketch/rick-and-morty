@@ -144,6 +144,7 @@ Hieronder staan de screenshots uit de map public/screenshots. Elke afbeelding la
 - Cursusmateriaal van Web Advanced
 - W3school voor bepaalde informatie https://www.w3schools.com/nodejs/nodejs_intro.asp
 - AI-hulp van ChatGpt https://chatgpt.com/share/6a7073ea-3e08-83ed-9fa3-35a00b2f8e8f
+- AI-hulp van Copilot https://copilot.microsoft.com/shares/Sp2SdSyoTkq7f6ctFVgEn
 
 ## Extra uitleg voor de leerkracht
 
